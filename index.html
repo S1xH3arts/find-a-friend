@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+    .popup-content {
+      text-align: center;
+    }
+    .popup-content img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Replace this with your actual PeddleHosting server + port
+    const apiURL = 'https://yourdomain.peddlehost.com:3000/locations';
+
+    const map = L.map('map').setView([54.5, -3], 5); // Center over UK
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    fetch(apiURL)
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(user => {
+          const marker = L.marker([user.lat, user.lng]).addTo(map);
+          marker.bindPopup(`
+            <div class="popup-content">
+              <img src="${user.avatar}" alt="${user.name}"><br>
+              <strong>${user.name}</strong><br>
+              ${user.location}
+            </div>
+          `);
+        });
+      })
+      .catch(err => {
+        console.error('Failed to fetch location data:', err);
+        alert('Could not load location data.');
+      });
+  </script>
+</body>
+</html>
